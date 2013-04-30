@@ -20,22 +20,27 @@
 
 package com.fortysevendeg.android.swipelistview;
 
-import android.graphics.Rect;
-import android.os.Handler;
-import android.view.*;
-import android.widget.AbsListView;
-import android.widget.ListView;
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.AnimatorListenerAdapter;
-import com.nineoldandroids.animation.ValueAnimator;
+import static com.nineoldandroids.view.ViewHelper.setAlpha;
+import static com.nineoldandroids.view.ViewHelper.setTranslationX;
+import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.nineoldandroids.view.ViewHelper.setAlpha;
-import static com.nineoldandroids.view.ViewHelper.setTranslationX;
-import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ListView;
+
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.AnimatorListenerAdapter;
+import com.nineoldandroids.animation.ValueAnimator;
 
 /**
  * Touch listener impl for the SwipeListView
@@ -313,7 +318,9 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
             generateRevealAnimate(view, swap, swapRight, position);
         }
         if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_DISMISS) {
-            generateDismissAnimate(parentView, swap, swapRight, position);
+        	int[] positionArray = new int[1];
+        	positionArray[0] = position;
+            swipeListView.onDismiss(positionArray);
         }
     }
 
@@ -460,6 +467,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
      */
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
+    	boolean swipingRight = false;
+    	
         if (viewWidth < 2) {
             viewWidth = swipeListView.getWidth();
         }
@@ -589,11 +598,12 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                 }
                 if (deltaMode > slop && swipeCurrentAction == SwipeListView.SWIPE_ACTION_NONE && velocityY < velocityX) {
                     swiping = true;
-                    boolean swipingRight = (deltaX > 0);
+                    swipingRight = (deltaX > 0);
                     if (opened.get(downPosition)) {
                         swipeListView.onStartClose(downPosition, swipingRight);
                         swipeCurrentAction = SwipeListView.SWIPE_ACTION_REVEAL;
                     } else {
+                    	
                         if (swipingRight && swipeActionRight == SwipeListView.SWIPE_ACTION_DISMISS) {
                             swipeCurrentAction = SwipeListView.SWIPE_ACTION_DISMISS;
                         } else if (!swipingRight && swipeActionLeft == SwipeListView.SWIPE_ACTION_DISMISS) {
@@ -619,7 +629,9 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                     if (opened.get(downPosition)) {
                         deltaX += openedRight.get(downPosition) ? viewWidth - rightOffset : -viewWidth + leftOffset;
                     }
-                    move(deltaX);
+                    
+                    if(!swipingRight)
+                    	move(deltaX);
                     return true;
                 }
                 break;
@@ -635,9 +647,10 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
     public void move(float deltaX) {
         swipeListView.onMove(downPosition, deltaX);
         if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_DISMISS) {
-            setTranslationX(parentView, deltaX);
+        	//Nothing
+            /*setTranslationX(parentView, deltaX);
             setAlpha(parentView, Math.max(0f, Math.min(1f,
-                    1f - 2f * Math.abs(deltaX) / viewWidth)));
+                    1f - 2f * Math.abs(deltaX) / viewWidth)));*/
         } else {
             setTranslationX(frontView, deltaX);
         }
