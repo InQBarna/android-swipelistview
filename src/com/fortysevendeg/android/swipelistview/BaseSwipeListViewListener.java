@@ -41,4 +41,8 @@ public class BaseSwipeListViewListener implements SwipeListViewListener {
     public int onChangeSwipeMode(int position) {
         return SwipeListView.SWIPE_MODE_DEFAULT;
     }
+
+	@Override
+	public void onLongClickFrontView(int position) {
+	}
 }

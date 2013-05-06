@@ -133,7 +133,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
             frontView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    openAnimate(downPosition);
+                	swipeListView.onLongClickFrontView(downPosition);
                     return false;
                 }
             });

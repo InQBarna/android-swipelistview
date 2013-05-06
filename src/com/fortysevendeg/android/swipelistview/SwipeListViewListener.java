@@ -89,5 +89,11 @@ public interface SwipeListViewListener {
      * @return type
      */
     int onChangeSwipeMode(int position);
+    
+    /**
+     * Called when user long click on the front view
+     * @param position list item
+     */
+    void onLongClickFrontView(int position);
 
 }
