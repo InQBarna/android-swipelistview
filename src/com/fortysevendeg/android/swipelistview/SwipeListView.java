@@ -117,6 +117,8 @@ public class SwipeListView extends ListView {
      * Internal listener for common swipe events
      */
     private BaseSwipeListViewListener swipeListViewListener;
+    
+    
 
     /**
      * Internal touch listener
@@ -152,6 +154,8 @@ public class SwipeListView extends ListView {
         init(attrs);
     }
 
+   
+    
     /**
      * Init ListView
      *

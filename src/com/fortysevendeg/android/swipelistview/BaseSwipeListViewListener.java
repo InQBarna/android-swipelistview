@@ -1,6 +1,11 @@
 package com.fortysevendeg.android.swipelistview;
 
+import java.util.List;
+
 public class BaseSwipeListViewListener implements SwipeListViewListener {
+	
+	private List<Integer> motionLessPositions; 
+	
     @Override
     public void onOpened(int position, boolean toRight) {
     }
@@ -40,6 +45,7 @@ public class BaseSwipeListViewListener implements SwipeListViewListener {
     @Override
     public int onChangeSwipeMode(int position) {
         return SwipeListView.SWIPE_MODE_DEFAULT;
+    	
     }
 
 	@Override
