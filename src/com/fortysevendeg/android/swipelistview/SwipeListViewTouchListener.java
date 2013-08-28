@@ -536,6 +536,27 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 		}
 
 	}
+	
+	
+	private void clearStateOnUP(boolean swap) {
+		if (null != velocityTracker) {
+			velocityTracker.recycle();
+			velocityTracker = null;
+		}
+		downX = 0;
+		blockFling = false;
+		lastXVelocity = 0;
+		
+		// change clickable front view
+		if (swap) {
+			frontView.setClickable(opened.get(downPosition));
+			frontView.setLongClickable(opened.get(downPosition));
+		}
+		frontView = null;
+		backView = null;
+		this.downPosition = ListView.INVALID_POSITION;
+		swiping = false;
+	}
 
 	/**
 	 * @see View.OnTouchListener#onTouch(android.view.View,
@@ -595,6 +616,9 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 
 		case MotionEvent.ACTION_UP: {
 			if (velocityTracker == null || !swiping) {
+				
+				// should reset state... because VerticalMovement won't start swipe, but remembers downposition!!!
+				clearStateOnUP(false);
 				break;
 			}
 
@@ -638,21 +662,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 
 			generateAnimate(frontView, swap, swapRight, downPosition);
 			
+			clearStateOnUP(swap);
 
-			velocityTracker.recycle();
-			velocityTracker = null;
-			downX = 0;
-			blockFling = false;
-			lastXVelocity = 0;
-			// change clickable front view
-			if (swap) {
-				frontView.setClickable(opened.get(downPosition));
-				frontView.setLongClickable(opened.get(downPosition));
-			}
-			frontView = null;
-			backView = null;
-			this.downPosition = ListView.INVALID_POSITION;
-			swiping = false;
 			break;
 		}
 
