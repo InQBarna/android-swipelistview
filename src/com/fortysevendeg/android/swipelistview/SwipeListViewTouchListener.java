@@ -557,6 +557,16 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 		this.downPosition = ListView.INVALID_POSITION;
 		swiping = false;
 	}
+	
+	private static class NeutralSwipeEnableProvider implements SwipeEnableProvider {
+
+		@Override
+		public boolean isSwipeEnabled(int position) {
+			return true;
+		}
+		
+	}
+	private NeutralSwipeEnableProvider neutralProvider = new NeutralSwipeEnableProvider();
 
 	/**
 	 * @see View.OnTouchListener#onTouch(android.view.View,
@@ -583,12 +593,24 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 			int x = (int) motionEvent.getRawX() - listViewCoords[0];
 			int y = (int) motionEvent.getRawY() - listViewCoords[1];
 			View child;
+			
+			SwipeEnableProvider provider = null;
+			if (swipeListView.getAdapter() instanceof SwipeEnableProvider) {
+				provider = (SwipeEnableProvider)swipeListView.getAdapter();
+			} else {
+				provider = neutralProvider;
+			}
+			
+			
+			int firstVisiblePos = swipeListView.getFirstVisiblePosition();
+			
 			for (int i = 0; i < childCount; i++) {
 				child = swipeListView.getChildAt(i);
 
 				child.getHitRect(rect);
 				if (rect.contains(x, y) 
-						&& swipeListView.getAdapter().isEnabled(swipeListView.getFirstVisiblePosition() + i)) {
+						&& swipeListView.getAdapter().isEnabled(firstVisiblePos + i)
+						&& provider.isSwipeEnabled(firstVisiblePos + i)) {
 					
 					setParentView(child);
 					setFrontView(child.findViewById(swipeFrontView));
