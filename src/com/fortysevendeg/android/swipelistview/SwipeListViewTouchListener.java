@@ -129,6 +129,17 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 		this.parentView = parentView;
 	}
 
+	
+	private class MemoryDownListener implements View.OnClickListener {
+		private int dPos;
+		public MemoryDownListener(int pos) {
+			dPos = pos;
+		}
+		@Override
+		public void onClick(View v) {
+			swipeListView.onClickFrontView(dPos);
+		}
+	}
 	/**
 	 * Sets current item's front view
 	 * 
@@ -137,12 +148,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 	 */
 	private void setFrontView(View frontView) {
 		this.frontView = frontView;
-		frontView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				swipeListView.onClickFrontView(downPosition);
-			}
-		});
+		frontView.setOnClickListener(new MemoryDownListener(downPosition));
 		if (swipeOpenOnLongPress) {
 			frontView.setOnLongClickListener(new View.OnLongClickListener() {
 				@Override
@@ -609,21 +615,23 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 
 				child.getHitRect(rect);
 				if (rect.contains(x, y) 
-						&& swipeListView.getAdapter().isEnabled(firstVisiblePos + i)
-						&& provider.isSwipeEnabled(firstVisiblePos + i)) {
+						&& swipeListView.getAdapter().isEnabled(firstVisiblePos + i)) {
 					
 					setParentView(child);
-					setFrontView(child.findViewById(swipeFrontView));
 					downX = motionEvent.getRawX();
 					downPosition = swipeListView.getPositionForView(child);
+					setFrontView(child.findViewById(swipeFrontView));
+
 
 					frontView.setClickable(!opened.get(downPosition));
 					frontView.setLongClickable(!opened.get(downPosition));
 
-					velocityTracker = VelocityTracker.obtain();
-					velocityTracker.addMovement(motionEvent);
-					if (swipeBackView > 0) {
-						setBackView(child.findViewById(swipeBackView));
+					if (provider.isSwipeEnabled(firstVisiblePos + i)) {
+						velocityTracker = VelocityTracker.obtain();
+						velocityTracker.addMovement(motionEvent);
+						if (swipeBackView > 0) {
+							setBackView(child.findViewById(swipeBackView));
+						}
 					}
 
 					break;
