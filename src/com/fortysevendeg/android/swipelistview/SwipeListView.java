@@ -165,6 +165,7 @@ public class SwipeListView extends ListView {
 
         int swipeMode = SWIPE_MODE_BOTH;
         boolean swipeOpenOnLongPress = true;
+        boolean detectDoubleClick = true;
         boolean swipeCloseAllItemsWhenMoveList = true;
         long swipeAnimationTime = 0;
         float swipeOffsetLeft = 0;
@@ -209,6 +210,7 @@ public class SwipeListView extends ListView {
         touchListener.setSwipeMode(swipeMode);
         touchListener.setSwipeClosesAllItemsWhenListMoves(swipeCloseAllItemsWhenMoveList);
         touchListener.setSwipeOpenOnLongPress(swipeOpenOnLongPress);
+        touchListener.setDetectDoubleClick(detectDoubleClick);
         setOnTouchListener(touchListener);
         setOnScrollListener(touchListener.makeScrollListener());
     }
@@ -301,6 +303,17 @@ public class SwipeListView extends ListView {
     protected void onLongClickFrontView(int position) {
         if (swipeListViewListener != null) {
             swipeListViewListener.onLongClickFrontView(position);
+        }
+    }
+    
+    /**
+     * Notifies onDoubleClick
+     * 
+     * @param position item click
+     */
+    protected void onDoubleClickFrontView(int position) {
+    	if (swipeListViewListener != null) {
+            swipeListViewListener.onDoubleClickFrontView(position);
         }
     }
 

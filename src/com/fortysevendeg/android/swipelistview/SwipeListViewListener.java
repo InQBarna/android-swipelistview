@@ -95,5 +95,7 @@ public interface SwipeListViewListener {
      * @param position list item
      */
     void onLongClickFrontView(int position);
+    
+    void onDoubleClickFrontView(int position);
 
 }
