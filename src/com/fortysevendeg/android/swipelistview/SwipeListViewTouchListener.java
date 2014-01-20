@@ -96,6 +96,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 	private boolean listViewMoving;
 	private boolean blockFling = false;
 	private double lastXVelocity = 0;
+	private static final int MILLIS_DOUBLE_CLICK = 500;
+	private boolean lockClick = false;
 
 	/**
 	 * Constructor
@@ -128,6 +130,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 		this.parentView = parentView;
 	}
 
+	private Handler handler = new Handler();
+	
 	private class MemoryDownListener implements View.OnClickListener {
 		private int dPos;
 
@@ -137,7 +141,18 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 
 		@Override
 		public void onClick(View v) {
-			swipeListView.onClickFrontView(dPos);
+			
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					if (!lockClick) {
+						//Log.d("M","onClick");
+						swipeListView.onClickFrontView(dPos);
+					}
+				}
+			}, MILLIS_DOUBLE_CLICK+10);
+			
 		}
 	}
 
@@ -157,7 +172,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 		// event when double tap occurs
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
-			Log.d("M", "DoubleTap: " + rememberedDownPosition);
+			//Log.d("M", "DoubleTap: " + rememberedDownPosition);
 			swipeListView.onLongClickFrontView(rememberedDownPosition);
 			return true;
 		}
@@ -256,8 +271,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 	public void setSwipeOpenOnLongPress(boolean swipeOpenOnLongPress) {
 		this.swipeOpenOnLongPress = swipeOpenOnLongPress;
 	}
-	
-	
+
 	/**
 	 * Set if we detect doubleclick action or not
 	 * 
@@ -266,7 +280,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 	public void setDetectDoubleClick(boolean detectDoubleClick) {
 		this.detectDoubleTap = detectDoubleClick;
 	}
-	
 
 	/**
 	 * Sets the swipe mode
@@ -350,7 +363,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 							position - swipeListView.getFirstVisiblePosition())
 							.findViewById(swipeFrontView), position);
 		} catch (NullPointerException e) {
-			Log.d("M", "Vale, es nulo, no hacemos nada a ver que pasa...");
+			//Log.d("M", "Vale, es nulo, no hacemos nada a ver que pasa...");
 		}
 	}
 
@@ -638,18 +651,20 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 
 						frontView.setClickable(!opened.get(downPosition));
 						frontView.setLongClickable(!opened.get(downPosition));
+						lockClick = false;
 						if (detectDoubleTap && !opened.get(downPosition)) {
-							Log.d("M","Entramos a mirar doubletap??");
+							//Log.d("M", "Entramos a mirar doubletap??");
 							long thisTime = System.currentTimeMillis();
-							if (thisTime - lastTouchTime < 500) {
+							if (thisTime - lastTouchTime < MILLIS_DOUBLE_CLICK) {
 								swipeListView.onDoubleClickFrontView(downPosition);
 								lastTouchTime = -1;
+								lockClick = true;
 							} else {
 								// too slow
 								lastTouchTime = thisTime;
 							}
 						}
-						
+
 						if (provider.isSwipeEnabled(firstVisiblePos + i)) {
 							velocityTracker = VelocityTracker.obtain();
 							velocityTracker.addMovement(motionEvent);
