@@ -20,22 +20,12 @@
 
 package com.fortysevendeg.android.swipelistview;
 
-import static com.nineoldandroids.view.ViewHelper.setAlpha;
-import static com.nineoldandroids.view.ViewHelper.setTranslationX;
-import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import android.graphics.Rect;
 import android.os.Handler;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -44,6 +34,14 @@ import android.widget.ListView;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.ValueAnimator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static com.nineoldandroids.view.ViewHelper.setAlpha;
+import static com.nineoldandroids.view.ViewHelper.setTranslationX;
+import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 
 /**
  * Touch listener impl for the SwipeListView
@@ -96,7 +94,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 	private boolean listViewMoving;
 	private boolean blockFling = false;
 	private double lastXVelocity = 0;
-	private static final int MILLIS_DOUBLE_CLICK = 500;
+	private static final int MILLIS_DOUBLE_CLICK_END = 500;
+    private static final int MILLIS_DOUBLE_CLICK_START = 100;
 	private boolean lockClick = false;
 
 	/**
@@ -151,7 +150,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 						swipeListView.onClickFrontView(dPos);
 					}
 				}
-			}, MILLIS_DOUBLE_CLICK+10);
+			}, MILLIS_DOUBLE_CLICK_END +10);
 			
 		}
 	}
@@ -655,7 +654,9 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 						if (detectDoubleTap && !opened.get(downPosition)) {
 							//Log.d("M", "Entramos a mirar doubletap??");
 							long thisTime = System.currentTimeMillis();
-							if (thisTime - lastTouchTime < MILLIS_DOUBLE_CLICK) {
+
+                            long diffTime = thisTime - lastTouchTime;
+							if (diffTime > MILLIS_DOUBLE_CLICK_START && diffTime < MILLIS_DOUBLE_CLICK_END) {
 								swipeListView.onDoubleClickFrontView(downPosition);
 								lastTouchTime = -1;
 								lockClick = true;
