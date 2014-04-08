@@ -599,6 +599,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 
 	private NeutralSwipeEnableProvider neutralProvider = new NeutralSwipeEnableProvider();
 	private long lastTouchTime;
+    private long lastTouchCell = -1;
 
 	/**
 	 * @see View.OnTouchListener#onTouch(android.view.View,
@@ -654,15 +655,17 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
 						if (detectDoubleTap && !opened.get(downPosition)) {
 							//Log.d("M", "Entramos a mirar doubletap??");
 							long thisTime = System.currentTimeMillis();
-
                             long diffTime = thisTime - lastTouchTime;
-							if (diffTime > MILLIS_DOUBLE_CLICK_START && diffTime < MILLIS_DOUBLE_CLICK_END) {
+							if (diffTime > MILLIS_DOUBLE_CLICK_START && diffTime < MILLIS_DOUBLE_CLICK_END &&
+                                downPosition == lastTouchCell) {
 								swipeListView.onDoubleClickFrontView(downPosition);
 								lastTouchTime = -1;
+                                lastTouchCell = -1;
 								lockClick = true;
 							} else {
 								// too slow
 								lastTouchTime = thisTime;
+                                lastTouchCell = downPosition;
 							}
 						}
 
